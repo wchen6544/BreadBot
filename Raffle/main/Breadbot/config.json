@@ -1,0 +1,98 @@
+{
+  "General": {
+    "licenseKey" : "Air",
+    "2CaptchaKey" : "eaef486b1c8d5aa4e20d3244d207be8e",
+    "discordWebhook" : "www.discord.com"
+  },
+  "Sites": {
+      "Snipes":{
+         "Shoe": "Dunk Low EMB Knicks",
+         "Tasks": 1,
+         "Size" : "11",
+         "Name": "Jason Wu",
+         "Store": "Snipes- 86th Street"
+      },
+      "SnipesConfirm": {
+        "Tasks": 2
+      },
+      "Atmos": {
+        "Shoe": "YEEZY QNTM \"ONYX\"",
+        "Tasks": 1,
+        "Release": "web",
+        "Size" : "5,6,5_5,6_5"
+      },
+      "Patta": {
+        "URL": "https://www.patta.nl/blogs/raffles/adidas-yeezy-boost-350-v2-1",
+        "Tasks" : 1,
+        "Size": "8,9,10"
+      },
+      "Copdate": {
+        "URL": "https://list.copdate.com/event/xb-usaqrtrsnks",
+        "Tasks" : 3,
+        "Size": "11,12,13"
+      },
+      "DTLR": {
+        "URL": "https://forms.dtlr.com/212414614620848",
+        "Tasks" : 1,
+        "Size": "10,11"
+      },
+      "DSMNY": {
+        "URL": "https://newyork.doverstreetmarket.com/new-items/new-balance",
+        "Tasks" : 1,
+        "Size": "8,9,10"
+      },
+      "DSML": {
+        "URL": "https://london.doverstreetmarket.com/new-items/nike-air-max",
+        "Tasks" : 1,
+        "Size": "8,9,10"
+      },
+      "Xhibition": {
+        "URL": "https://www.xhibition.co/pages/raffle-7",
+        "Tasks" : 1,
+        "Size": "8,9,10"
+      },
+      "Kith": {
+        "URL": "https://www.kith.com/pages/raffle-7",
+        "Tasks" : 1,
+        "Size": "8,9,10"
+      },
+      "Undefeated": {
+        "URL": "https://www.undefeated.com/pages/raffle-7",
+        "Tasks" : 1,
+        "Size": "8,9,10"
+      },
+      "Oqium": {
+        "Shoe": "WOMENS AIR JORDAN 4 RETRO 'SHIMMER'",
+        "Tasks" : 1,
+        "Size": "US 5 / EU 37.5,US 6 / EU 38.5,US 8 / EU 41,US 9 / EU 42.5,US 10 / EU 44,US 11 / EU 45,US 12 / EU 46,US 10.5 / EU 44.5"
+      },
+      "rsvp": {
+        "URL": "https://gleam.io/u5xyK/yzy-knit-rnr-bt-sulfur",
+        "Tasks" : 1,
+        "Size": "12"
+      },
+      "Bodega": {
+        "URL": "https://gleam.io/jA05p/air-jordan-13-retro-low-singles-day",
+        "Tasks": 1,
+        "Size": "8M"
+      },
+      "Darkside": {
+        "URL": "https://gleam.io/K82TO/nike-dunk-low-championship-red",
+        "Tasks": 1,
+        "Size": "11"
+      },
+      "Footlocker": {
+        "Tasks": 1,
+        "Size": "07.0",
+        "Shoe": "620657415822790ea654d399",
+        "Store": "11214"
+
+      },
+      "Footlocker Acc Gen": {
+        "Tasks": 1
+      },
+      "Footlocker Acc Confirm": {
+        "Tasks": 1
+      }
+  }
+}
