@@ -40,6 +40,9 @@ func Confirm(config interface{}, necessary interface{}){
 	client.SetHeader("sec-fetch-dest", "empty")
 	client.SetHeader("accept-language", "en-US,en;q=0.9")
 	client.SetProxy(proxy)
+	client.SetTimeout(30 * time.Second)
+
+
 	timestamp := time.Now().UnixNano() / 1000000
 	resp, err := client.R().
     SetBody(`{"activationToken":"` + token + `"}`).

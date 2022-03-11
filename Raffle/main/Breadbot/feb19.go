@@ -58,7 +58,7 @@ ____                     _ _           _
 [2] Footlocker Acc Gen
 [3] Footlocker Acc Confirm
     `
-    //colorReset := "\033[0m"
+    colorReset := "\033[0m"
     colorRed := "\033[31m"
     colorGreen := "\033[32m"
     //colorYellow := "\033[33m"
@@ -71,7 +71,7 @@ ____                     _ _           _
         rand.Seed(time.Now().UnixNano())
         Fails := []string{}
         Success := []string{}
-        fmt.Println(string(colorCyan), breadBot)
+        fmt.Println(string(colorCyan), breadBot + string(colorReset))
         fmt.Print("Enter your site selection: ")
         var userInput string
         fmt.Scanln(&userInput)
@@ -99,7 +99,7 @@ ____                     _ _           _
             "Footlocker Acc Gen": footlocker.Gen,
             "Footlocker Acc Confirm": footlocker.Confirm,
         }
-        fmt.Println()
+
         for taskNumber, email := range emailList {
             mm := struc.Necessary{email, proxyList[taskNumber], resultData, &wg, workerPool, taskNumber}
             go call(getSite(userInput), site, mm)
@@ -109,10 +109,10 @@ ____                     _ _           _
         for i := 0; i < len(emailList); i++ {
             returnData := <-resultData
             if returnData["status"] == "Bad" {
-                fmt.Println(string(colorRed) + "Failed to Enter: ", returnData["email"])
+                fmt.Println(string(colorRed) + "Failed to Enter: ", returnData["email"] + string(colorReset))
                 Fails = append(Fails, returnData["email"])
             } else {
-                fmt.Println(string(colorGreen) + "Entered: ", returnData["email"])
+                fmt.Println(string(colorGreen) + "Successfully Entered: ", returnData["email"] + string(colorReset))
                 Success = append(Success, returnData["email"])
             }
         }
@@ -121,13 +121,14 @@ ____                     _ _           _
         fmt.Print(strings.Join(Fails[:], "\n"))
         fmt.Println("\n__________________________")
         fmt.Println(strings.Join(Success[:], "\n"))
+        begin()
     }
 }
 
 func call(funcName string, params ... interface{}) (err error) {
     f := reflect.ValueOf(StubStorage[funcName])
     if len(params) != f.Type().NumIn() {
-        err = errors.New("The number of params is out of index.")
+        err = errors.New("Error with Task Manager")
         return
     }
     in := make([]reflect.Value, len(params))

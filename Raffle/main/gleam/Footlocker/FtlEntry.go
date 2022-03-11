@@ -4,7 +4,7 @@ package Footlocker
 TODO
 - add zipcode/address support like error handling
 - improve codebase
-- add time sleep
+- add no acc err handling last post
 */
 import (
 	"fmt"
@@ -60,7 +60,7 @@ func Start(config interface{}, necessary interface{}){
 	randSize := strings.Split(c.Size, ",")
 	size := randSize[rand.Intn(len(randSize))]
 	taskN := strconv.Itoa(taskNumber)
-	fmt.Println("Starting Task " + taskN)
+	//fmt.Println("Starting Task " + taskN)
 	storeIDs := []string{}
 	a := time.Now().UnixNano() / int64(time.Millisecond)
 	requestID := strings.ToUpper(GenRandom(8)) + "-" + strings.ToUpper(GenRandom(4)) + "-" + strings.ToUpper(GenRandom(4)) + "-" + strings.ToUpper(GenRandom(4)) + "-" + strings.ToUpper(GenRandom(12))
@@ -82,17 +82,19 @@ func Start(config interface{}, necessary interface{}){
 	client.SetHeader("X-API-LANG", "en-US")
 	client.SetHeader("X-FL-REQUEST-ID", requestID)
 	client.SetProxy(proxy)
+	client.SetTimeout(30 * time.Second)
+
 	resp, err := client.R().
 	Get("https://www.footlocker.com/apigate/v3/session")
 	if err != nil {
-		fmt.Println("Task Number " + taskN + " : ", err)
+		fmt.Println("Task " + taskN + " : ", err)
 		<- c1.CH
 		c1.ReturnData <- map[string]string{"email": email, "status": "Bad"}
 		return 
 	}
 	//fmt.Println("Response 1: ", resp.String())
 	if !strings.Contains(resp.String(), "csrfToken") {
-		fmt.Println("Task Number " + taskN + " : Cannot Generate Session")
+		fmt.Println("Task " + taskN + " : Cannot Generate Session")
 		<- c1.CH
 		c1.ReturnData <- map[string]string{"email": email, "status": "Bad"}
 		return 
@@ -108,14 +110,14 @@ func Start(config interface{}, necessary interface{}){
     SetHeader("X-FLAPI-SESSION-ID", jSessionId).
 	Post("https://www.footlocker.com/apigate/v3/auth")
 	if err != nil {
-		fmt.Println("Task Number " + taskN + " : ", err)
+		fmt.Println("Task " + taskN + " : ", err)
 		<- c1.CH
 		c1.ReturnData <- map[string]string{"email": email, "status": "Bad"}
 		return 
 	}
 
 	if strings.Contains(resp2.String(), "geo") {
-		fmt.Println("Task Number " + taskN + " : Proxy Ban")
+		fmt.Println("Task " + taskN + " : Proxy Ban")
 		<- c1.CH
 		c1.ReturnData <- map[string]string{"email": email, "status": "Bad"}
 		return
@@ -136,7 +138,7 @@ func Start(config interface{}, necessary interface{}){
 	Get("https://www.footlocker.com/apigate/v3/users/account-info")
 
 	if err != nil {
-		fmt.Println("Task Number " + taskN + " : ", err)
+		fmt.Println("Task " + taskN + " : ", err)
 		<- c1.CH
 		c1.ReturnData <- map[string]string{"email": email, "status": "Bad"}
 		return 
@@ -145,7 +147,7 @@ func Start(config interface{}, necessary interface{}){
 	//fmt.Println("Response 3: ", resp3.String())
 
 	if strings.Contains(resp3.String(), "geo") {
-		fmt.Println("Task Number " + taskN + " : Proxy Ban", )
+		fmt.Println("Task " + taskN + " : Proxy Ban", )
 		<- c1.CH
 		c1.ReturnData <- map[string]string{"email": email, "status": "Bad"}
 		return
@@ -166,7 +168,7 @@ func Start(config interface{}, necessary interface{}){
 	Get("https://www.footlocker.com/apigate/launch-stores")
 
 	if err != nil {
-		fmt.Println("Task Number " + taskN + " : ", err)
+		fmt.Println("Task " + taskN + " : ", err)
 		<- c1.CH
 		c1.ReturnData <- map[string]string{"email": email, "status": "Bad"}
 		return 
@@ -185,15 +187,15 @@ func Start(config interface{}, necessary interface{}){
 	}
 	//fmt.Println(storeIDs, len(storeIDs))
 	if len(storeIDs) == 0 {
-		fmt.Println("Task Number " + taskN + " : No Available Stores")
+		fmt.Println("Task " + taskN + " : No Available Stores")
 		<- c1.CH
 		c1.ReturnData <- map[string]string{"email": email, "status": "Bad"}
 		return 
 	}
 	//fmt.Println(cCoreCustomerId)
 	factor := GenerateFactor(cCoreCustomerId, proxy)
-	if factor == "error" {
-		fmt.Println("Task Number " + taskN + " : Factor Error")
+	if strings.Contains(factor, "error") || factor == "Proxy Ban" || factor == "Factor Limit" {
+		fmt.Println("Task " + taskN + " : Factor Error : " + factor)
 		<- c1.CH
 		c1.ReturnData <- map[string]string{"email": email, "status": "Bad"}
 		return 
@@ -257,7 +259,7 @@ func Start(config interface{}, necessary interface{}){
 	//fmt.Println(accessToken, jSessionId, cCoreCustomerId, customerID, csrfToken, resp2.Cookies())
 	//fmt.Println(strings.Split(strings.Split(coo, "JSESSIONID=")[1], ";")[0])
 	if err != nil {
-		fmt.Println("Task Number " + taskN + " : ", err)
+		fmt.Println("Task " + taskN + " : ", err)
 		<- c1.CH
 		c1.ReturnData <- map[string]string{"email": email, "status": "Bad"}
 		return 
@@ -266,8 +268,11 @@ func Start(config interface{}, necessary interface{}){
 	//fmt.Println("Response 5: ", finalResp.String())
 	if strings.Contains(finalResp.String(), `"reservations":true`) {
 		c1.ReturnData <- map[string]string{"email": email, "status": "Success"}
-	} else if strings.Contains(finalResp.String(), "Duplicate") {
-		fmt.Println(finalResp.String())
+	} else if strings.Contains(finalResp.String(), "DuplicateRecordError") {
+		fmt.Println("Task " + taskN + " : Duplicate Entry")
+		c1.ReturnData <- map[string]string{"email": email, "status": "Success"}
+	} else if strings.Contains(finalResp.String(), "unAuthorisedUser") {
+		fmt.Println("Task " + taskN + " : Account doesn't exist")
 		c1.ReturnData <- map[string]string{"email": email, "status": "Bad"}
 	} else {
 		fmt.Println(finalResp.String())

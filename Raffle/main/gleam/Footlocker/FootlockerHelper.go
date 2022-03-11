@@ -10,7 +10,6 @@ import (
     jwt "github.com/golang-jwt/jwt"
     "github.com/tidwall/gjson"
     b64 "encoding/base64"
-    "fmt"
     "strings"
     "github.com/go-resty/resty/v2"
     "crypto/sha256"
@@ -58,6 +57,7 @@ func GenerateFactor(token string, proxy string) string{
 
 	client := resty.New()
 	client.SetProxy(proxy)
+	client.SetTimeout(30 * time.Second)
 
 
 	resp, err := client.R().
@@ -79,11 +79,11 @@ func GenerateFactor(token string, proxy string) string{
 	//fmt.Println("response1", resp.String())
 
 	if err != nil {
-        return "error"
+        return "error1"
 	}
 	if !strings.Contains(resp.String(), "customerId") {
 		//fmt.Println("1", resp.String())
-		return "error"
+		return "error1"
 	}
 
 
@@ -105,11 +105,10 @@ func GenerateFactor(token string, proxy string) string{
 	Post("https://www.footlocker.com/apigate/mfa-core/v1/send-challenge")
 
 	if err != nil {
-		return "error"
+		return "error2"
 	}
 	if strings.Contains(testProxy.String(), "geo") {
-		fmt.Println("Geo")
-		return "error"
+		return "Proxy Ban"
 	}
 
 
@@ -142,18 +141,15 @@ func GenerateFactor(token string, proxy string) string{
 	Post("https://verify.twilio.com/v2/Services/VAc6913fecf8cf66f1f3cf324563d6071d/Entities/" + token + "/Factors")
 	//fmt.Println("resp1.5", resp2.String())
 	if err != nil {
-		return "error"
+		return "error3"
 	}
 
 	if !strings.Contains(resp2.String(), "unverified") {
-		
 		if strings.Contains(resp2.String(), "60315") {
-
-			fmt.Println("Factor Limit: Error")
-		} else {
-			fmt.Println("2", resp2.String())
+			return "Factor Limit"
 		}
-		return "error"
+		fmt.Println(resp2.String())
+		return "error3"
 	}
 
 
@@ -169,12 +165,12 @@ func GenerateFactor(token string, proxy string) string{
 	SetHeader("Authorization", "Basic " + authToken1).
 	Post("https://verify.twilio.com/v2/Services/VAc6913fecf8cf66f1f3cf324563d6071d/Entities/" + token + "/Factors/" + sid)
 	if err != nil {
-		return "error"
+		return "error4"
 	}
 
 	if !strings.Contains(resp3.String(), "verified") {
-		fmt.Println("3", resp3.String())
-		return "error"
+		//fmt.Println("3", resp3.String())
+		return "error4"
 	}
 	time.Sleep(333 * time.Millisecond)
 	resp4, err := client.R().
@@ -194,10 +190,10 @@ func GenerateFactor(token string, proxy string) string{
 	Post("https://www.footlocker.com/apigate/mfa-core/v1/send-challenge")
 
 	if err != nil {
-		return "error"
+		return "error5"
 	}
 	if strings.Contains(resp4.String(), "geo") {
-		return "error"
+		return "Proxy Ban"
 	}
 
 	authToken2 := b64.StdEncoding.EncodeToString([]byte("token:" + jwt1(credential_sid, account_sid, privateKey)))
@@ -207,11 +203,11 @@ func GenerateFactor(token string, proxy string) string{
 	//fmt.Println("Response 4: ", resp5.String())
 
 	if err != nil {
-		return "error"
+		return "error6"
 	}
 	if !strings.Contains(resp5.String(), "pending") {
-		//fmt.Println("Task Number: Error")
-		return "error"
+		//fmt.Println("Task Number: ")
+		return "error6"
 	}
 
     challengeSid := gjson.Get(resp5.String(), "challenges.0.sid").String()
@@ -227,11 +223,10 @@ func GenerateFactor(token string, proxy string) string{
 	//fmt.Println("Response 5: ", resp6.String())
 	
 	if err != nil {
-		return "error"
+		return "error7"
 	}
 	if !strings.Contains(resp6.String(), "pending") {
-		fmt.Println("Task Number: Error")
-		return "error"
+		return "error7"
 	}
 
 
@@ -243,11 +238,10 @@ func GenerateFactor(token string, proxy string) string{
 	//fmt.Println("Response 6: ", resp7.String())
 
 	if err != nil {
-		return "error"
+		return "error8"
 	}
 	if !strings.Contains(resp7.String(), "pending") {
-		fmt.Println("Task Number: Error")
-		return "error"
+		return "error8"
 	}
 
 
@@ -264,7 +258,8 @@ func GenerateFactor(token string, proxy string) string{
 	if strings.Contains(resp8.String(), "approved") {
 		return sid
 	} else {
-		return "error"
+		fmt.Println(resp8.String())
+		return "error9"
 	}
 
 }
